@@ -1,0 +1,193 @@
+*{
+    font-family: monospace;
+    font-size: 14px;
+    color: white;
+}
+
+body{
+    margin : 0;
+    background-color: black;
+    overflow: hidden;
+}
+
+#canvas{
+    top : 0;
+    left : 0;
+    display: block;
+    position: absolute;
+}
+
+button {
+    position: block;
+    top: 5px;
+    left: 90px; /* Positioned to the right of FPS counter */
+    z-index: 100;
+    background: rgba(0,0,0,0.7);
+    border: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+button:hover {
+    opacity: 0.8;
+}
+
+/* styles.css */
+.control-panel {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    z-index: 100;
+  }
+  
+  .menu-container {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .menu-toggle {
+    background: rgba(0, 0, 0, 0.8);
+    border: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: opacity 0.2s;
+  }
+  
+  .menu-items {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 3px;
+    margin-top: 2px;
+    opacity: 0;
+    visibility: hidden;
+    transition: 
+      opacity 0.2s ease,
+      visibility 0.2s,
+      transform 0.2s ease;
+    transform: translateY(-10px);
+  }
+  
+  .menu-container:hover .menu-items {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    transition-delay: 0.1s;
+  }
+  
+  .menu-button {
+    display: block;
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    text-align: left;
+    white-space: nowrap;
+    transition: background 0.2s;
+  }
+  
+  .menu-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
+  .separator {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.2);
+    margin: 4px 0;
+  }
+
+  .submenu-container {
+    position: relative;
+  }
+  
+  .submenu-items {
+    position: absolute;
+    top: 0;
+    left: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 3px;
+    margin-left: 2px;
+    opacity: 0;
+    visibility: hidden;
+    transition: 
+      opacity 0.2s ease,
+      visibility 0.2s,
+      transform 0.2s ease;
+    transform: translateX(-10px);
+  }
+  
+  .submenu-container:hover .submenu-items {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+    transition-delay: 0.1s;
+  }
+
+#context-menu {
+  position: absolute;
+  z-index: 9999; /* Temporarily set to a very high value */
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 3px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  display: none; /* Ensure it is hidden by default */
+}
+
+#context-menu .context-menu-items {
+  display: block;
+}
+
+#context-menu .context-menu-button {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  transition: background 0.2s;
+  color: white; /* Ensure text is visible */
+}
+
+#context-menu .context-menu-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+#context-menu .context-separator {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 4px 0;
+}
+
+#context-menu .context-submenu-container {
+  position: relative;
+}
+
+#context-menu .context-submenu-items {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 3px;
+  margin-left: 2px;
+  opacity: 0;
+  visibility: hidden;
+  transition: 
+    opacity 0.2s ease,
+    visibility 0.2s,
+    transform 0.2s ease;
+  transform: translateX(-10px);
+}
+
+#context-menu .context-submenu-container:hover .context-submenu-items {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+  transition-delay: 0.1s;
+}
+

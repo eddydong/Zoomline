@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CasinoSim 0.01</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="control-panel">
+        <div class="menu-container" tabindex="-1">
+            <button class="menu-toggle">☰ MENU</button>
+            <div class="menu-items">
+                <button id="start-sim" class="menu-button">Start New Sim</button>
+                <button id="play-last-sim" class="menu-button">Play Last Sim</button>
+                <div class="separator"></div>
+                <button class="menu-button">Dashboard</button>
+                <div class="separator"></div>
+                <button class="menu-button">Patron Model</button>
+                <button class="menu-button">Dealer Model</button>
+                <button class="menu-button">Game Rules</button>
+                <button class="menu-button">Floor Layout</button>
+                <div class="separator"></div>
+                <button class="menu-button">Preference</button>
+                <div class="submenu-container">
+                    <button class="menu-button">Settings ☰</button>
+                    <div class="submenu-items">
+                        <button class="menu-button">Settings Option 1</button>
+                        <button class="menu-button">Settings Option 2</button>
+                    </div>
+                </div>
+                <div class="separator"></div>
+                <button class="menu-button">About</button>
+            </div>
+        </div>
+    </div>
+    <div id="context-menu" style="display: none;">
+        <div class="context-menu-items">
+            <button id="table-onoff" class="context-menu-button">Close Table</button>
+            <div class="context-separator"></div>
+            <div class="context-submenu-container">
+                <button class="context-menu-button">Set Min Bet Limit ☰</button>
+                <div class="context-submenu-items">
+                    <button class="context-menu-button" data-min-bet="500">HKD 500</button>
+                    <button class="context-menu-button" data-min-bet="1000">HKD 1000</button>
+                    <button class="context-menu-button" data-min-bet="1500">HKD 1500</button>
+                    <button class="context-menu-button" data-min-bet="2000">HKD 2000</button>
+                    <button class="context-menu-button" data-min-bet="3000">HKD 3000</button>
+                </div>
+            </div>
+            <div class="context-submenu-container">
+                <button class="context-menu-button">Set Max Bet Limit ☰</button>
+                <div class="context-submenu-items">
+                    <button class="context-menu-button" data-max-bet="1000000">HKD 1 Million</button>
+                    <button class="context-menu-button" data-max-bet="1500000">HKD 1.5 Million</button>
+                    <button class="context-menu-button" data-max-bet="2000000">HKD 2 Million</button>
+                    <button class="context-menu-button" data-max-bet="3000000">HKD 3 Million</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <canvas id="myCanvas"></canvas>
+    <script src="data.js"></script>
+    <script src="control.js"></script>
+    <script src="renderer.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
+
