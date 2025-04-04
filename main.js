@@ -1,3 +1,3 @@
 window.onresize();
-var grid = new Grid(5, 10);
+var grid = new Grid(200, 2000);
 animate();  

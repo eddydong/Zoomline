@@ -1,3 +1,45 @@
+var view = {
+    font: "monospace",
+    showStatus : true,
+}
+
+var fps = {
+    lastTime : performance.now(),
+    frameCount : 0,
+    fps : 0,
+    update: ()=>{
+        const now = performance.now();
+        fps.frameCount++;
+        if (now - fps.lastTime >= 1000) {
+            fps.fps = fps.frameCount;
+            fps.frameCount = 0;
+            fps.lastTime = now;
+        }
+    }
+}
+
+var leftBar = {
+    width : 200,
+    color : 'rgba(55,55,55,1)',
+    render : function() {
+        ctx.save();
+        ctx.fillStyle = this.color;
+        ctx.fillRect(0, 0, this.width, canvas.height);
+        ctx.restore();
+    }
+}
+
+var topBar = {
+    height : 50,
+    color : 'rgba(55,55,55,1)',
+    render : function() {
+        ctx.save();
+        ctx.fillStyle = this.color;
+        ctx.fillRect(0, 0, canvas.width, this.height);
+        ctx.restore();
+    }
+}
+
 function Cell(name, desc, start, duration, end) {
     this.name = name || "";
     this.type = 

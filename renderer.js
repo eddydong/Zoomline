@@ -1,30 +1,3 @@
-var view = {
-    font: "monospace",
-    showStatus : true,
-}
-
-var leftBar = {
-    width : 200,
-    color : 'rgba(55,55,55,1)',
-    render : function() {
-        ctx.save();
-        ctx.fillStyle = this.color;
-        ctx.fillRect(0, 0, this.width, canvas.height);
-        ctx.restore();
-    }
-}
-
-var topBar = {
-    height : 50,
-    color : 'rgba(55,55,55,1)',
-    render : function() {
-        ctx.save();
-        ctx.fillStyle = this.color;
-        ctx.fillRect(0, 0, canvas.width, this.height);
-        ctx.restore();
-    }
-}
-
 Grid.prototype.render = function() {
     ctx.save();
     const cellHeight = this.cellHeight;
@@ -61,26 +34,12 @@ Grid.prototype.render = function() {
     ctx.restore();
 }
 
-var fps = {
-    lastTime : performance.now(),
-    frameCount : 0,
-    fps : 0,
-    update: ()=>{
-        const now = performance.now();
-        fps.frameCount++;
-        if (now - fps.lastTime >= 1000) {
-            fps.fps = fps.frameCount;
-            fps.frameCount = 0;
-            fps.lastTime = now;
-        }
-    },
-    render: ()=>{
-        ctx.fillStyle = 'rgba(0,0,0,0.6)';
-        ctx.fillRect(canvas.width-79, 5, 74, 20);
-        ctx.fillStyle = 'white';
-        ctx.font = '14px ' + view.font;
-        ctx.fillText(`FPS: ${fps.fps}`, canvas.width-75, 20);
-    }
+fps.render = ()=>{
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fillRect(canvas.width-79, 5, 74, 20);
+    ctx.fillStyle = 'white';
+    ctx.font = '14px ' + view.font;
+    ctx.fillText(`FPS: ${fps.fps}`, canvas.width-75, 20);
 }
 
 function animate() {
