@@ -3,7 +3,7 @@ var ctx = canvas.getContext('2d', { willReadFrequently: true });
 
 var control = {
     panningSpeed : 1,
-    zoomSpeed : 0.005,
+    zoomSpeed : 0.002,
     pinchZoomSpeed : 0.02, 
     zoomMaxX : 5,
     zoomMinX : 0.05,
@@ -24,30 +24,14 @@ canvas.getPixelRGBA = function(x, y) {
 window.onresize = function() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+    timeline.init();
 }
 
-window.onload = function() {
-
-}
+let isZooming = false; // Flag to track zooming
+let zoomTimeout; // Timeout to reset the zooming flag
 
 canvas.addEventListener('wheel', (event) => {
     event.preventDefault();
-
-    function applyLimit(){
-        // Calculate the total grid size in pixels
-        const gridWidthPx = grid.cols * grid.cellWidth * grid.scaleX;
-        const gridHeightPx = grid.rows * grid.cellHeight * grid.scaleY;
-        
-        // Calculate the maximum allowed offsets
-        const minOffsetX = Math.min(0, canvas.width - gridWidthPx) + leftBar.width;
-        const maxOffsetX = leftBar.width;
-        const minOffsetY = Math.min(0, canvas.height - gridHeightPx) + topBar.height;
-        const maxOffsetY = topBar.height;
-        
-        // Apply the limits
-        grid.offsetX = Math.max(minOffsetX, Math.min(maxOffsetX, grid.offsetX));
-        grid.offsetY = Math.max(minOffsetY, Math.min(maxOffsetY, grid.offsetY));        
-    }
 
     // Handle different delta modes
     let deltaX = event.deltaX;
@@ -60,54 +44,42 @@ canvas.addEventListener('wheel', (event) => {
         deltaY *= window.innerHeight;
     }
 
-    if (event.shiftKey) { // Zooming - browsers send pinch gestures as ctrl+wheel events
-        // For pinch-to-zoom, browsers primarily use deltaY
-        // We need to apply this to both dimensions while keeping them separate
-        let zoomFactorX, zoomFactorY;
-        
-        zoomFactorX = 1 - deltaX * control.zoomSpeed;
-        zoomFactorY = 1 - deltaY * control.zoomSpeed;
-        
-        const rect = canvas.getBoundingClientRect();
-        const mouseX = event.clientX - rect.left;
-        const mouseY = event.clientY - rect.top;
-        const worldX = (mouseX - grid.offsetX) / grid.scaleX;
-        const worldY = (mouseY - grid.offsetY) / grid.scaleY;
-        const newScaleX = Math.min(Math.max(grid.scaleX * zoomFactorX, Math.max(control.zoomMinX,
-            (canvas.width-leftBar.width)/(grid.cellWidth * grid.cols))), control.zoomMaxX);
-        const newScaleY = Math.min(Math.max(grid.scaleY * zoomFactorY, Math.max(control.zoomMinY,
-            (canvas.height-topBar.height)/(grid.cellHeight * grid.rows))), control.zoomMaxY);
-        grid.offsetX = mouseX - worldX * newScaleX;
-        grid.offsetY = mouseY - worldY * newScaleY;
-        grid.scaleX = newScaleX;
-        grid.scaleY = newScaleY;
-    } else if (event.ctrlKey) { // Zooming - browsers send pinch gestures as ctrl+wheel events
-            // For pinch-to-zoom, browsers primarily use deltaY
-            // We need to apply this to both dimensions while keeping them separate
-            let zoomFactorX, zoomFactorY;
-            
-            zoomFactorX = 1 - deltaY * control.pinchZoomSpeed;
-            zoomFactorY = 1 - deltaY * control.pinchZoomSpeed;
-            
-            const rect = canvas.getBoundingClientRect();
-            const mouseX = event.clientX - rect.left;
-            const mouseY = event.clientY - rect.top;
-            const worldX = (mouseX - grid.offsetX) / grid.scaleX;
-            const worldY = (mouseY - grid.offsetY) / grid.scaleY;
-            const newScaleX = Math.min(Math.max(grid.scaleX * zoomFactorX, Math.max(control.zoomMinX,
-                (canvas.width-leftBar.width)/(grid.cellWidth * grid.cols))), control.zoomMaxX);
-            const newScaleY = Math.min(Math.max(grid.scaleY * zoomFactorY, Math.max(control.zoomMinY,
-                (canvas.height-topBar.height)/(grid.cellHeight * grid.rows))), control.zoomMaxY);
-            grid.offsetX = mouseX - worldX * newScaleX;
-            grid.offsetY = mouseY - worldY * newScaleY;
-            grid.scaleX = newScaleX;
-            grid.scaleY = newScaleY;
-    } else { // panning
-        grid.offsetX -= control.panningSpeed * deltaX;
-        grid.offsetY -= control.panningSpeed * deltaY;
-        // grid.velocityX = -deltaX * control.panningSpeed;
-        // grid.velocityY = -deltaY * control.panningSpeed;
+    function zoom(type) {
+        const mouseX = event.clientX - leftBar.width; // Get mouse X position relative to the timeline
+        const mouseTime = timeline.tL + mouseX * timeline.mspp; // Map mouse X to actual time on the timeline
+        let zoomFactorX;
+        switch (type) {
+            case 'shift': 
+                zoomFactorX = 1 + deltaX * control.zoomSpeed;
+                break;
+            case 'pinch':
+                zoomFactorX = 1 + deltaY * control.pinchZoomSpeed;
+                break;
+        }
+        let newTW = timeline.tW * zoomFactorX;
+        newTW = Math.max(timeline.minTW, Math.min(newTW, timeline.maxTW)); // Clamp the zoom level
+        if (newTW !== timeline.tW) {
+            timeline.tL = mouseTime - (mouseTime - timeline.tL) * (newTW / timeline.tW);
+            timeline.tW = newTW;
+            timeline.update();
+        }
     }
-    applyLimit();
+
+    if (event.shiftKey) { 
+        isZooming = true; // Set zooming flag
+        clearTimeout(zoomTimeout); // Clear any existing timeout
+        zoom('shift');
+        zoomTimeout = setTimeout(() => isZooming = false, 100); // Reset zooming flag after 100ms
+    } else if (event.ctrlKey) { 
+        isZooming = true; // Set zooming flag
+        clearTimeout(zoomTimeout); // Clear any existing timeout
+        zoom('pinch');
+        zoomTimeout = setTimeout(() => isZooming = false, 100); // Reset zooming flag after 100ms
+    } else if (!isZooming) { // Only pan if not zooming
+        if (Math.abs(deltaX) > 0.1) { // Ignore small residual deltaX values
+            timeline.tL += deltaX * timeline.mspp * control.panningSpeed;
+            timeline.update();
+        }
+    }
 });
 

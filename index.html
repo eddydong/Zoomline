@@ -11,17 +11,50 @@
         <div class="menu-container" tabindex="-1">
             <button class="menu-toggle">☰ MENU</button>
             <div class="menu-items">
-                <button id="start-sim" class="menu-button">Start New Sim</button>
-                <button id="play-last-sim" class="menu-button">Play Last Sim</button>
+
+                <div class="submenu-container">
+                    <button class="menu-button">Zoomline ☰</button>
+                    <div class="submenu-items">
+                        <button class="menu-button">Load Zoomline From Local File</button>
+                        <button class="menu-button">Save Zoomline To Local File</button>
+                        <div class="separator"></div>
+                        <button class="menu-button">Load Zoomline From Cloud</button>
+                        <button class="menu-button">Save Zoomline To Cloud</button>
+                    </div>
+                </div>
+
+                <div class="submenu-container">
+                    <button class="menu-button">Events ☰</button>
+                    <div class="submenu-items">
+                        <button class="menu-button">Load Events From Local File</button>
+                        <button class="menu-button">Save Events To Local File</button>
+                        <div class="separator"></div>
+                        <button class="menu-button">Load Events From Cloud</button>
+                        <button class="menu-button">Save Events To Cloud</button>
+                    </div>
+                </div>
+
                 <div class="separator"></div>
-                <button class="menu-button">Dashboard</button>
+
+                <div class="submenu-container">
+                    <button class="menu-button">View ☰</button>
+                    <div class="submenu-items">
+                        <button class="menu-button">Now</button>
+                        <div class="separator"></div>
+                        <button class="menu-button">Minute</button>
+                        <button class="menu-button">Hour</button>
+                        <button class="menu-button">Day</button>
+                        <button class="menu-button">Week</button>
+                        <button class="menu-button">Month</button>
+                        <button class="menu-button">Quarter</button>
+                        <button class="menu-button">Year</button>
+                    </div>
+                </div>
+
                 <div class="separator"></div>
-                <button class="menu-button">Patron Model</button>
-                <button class="menu-button">Dealer Model</button>
-                <button class="menu-button">Game Rules</button>
-                <button class="menu-button">Floor Layout</button>
-                <div class="separator"></div>
+
                 <button class="menu-button">Preference</button>
+
                 <div class="submenu-container">
                     <button class="menu-button">Settings ☰</button>
                     <div class="submenu-items">
@@ -29,7 +62,9 @@
                         <button class="menu-button">Settings Option 2</button>
                     </div>
                 </div>
+
                 <div class="separator"></div>
+
                 <button class="menu-button">About</button>
             </div>
         </div>
@@ -62,8 +97,8 @@
     <canvas id="myCanvas"></canvas>
     <script src="data.js"></script>
     <script src="common.js"></script>
-    <script src="models.js"></script>
     <script src="control.js"></script>
+    <script src="models.js"></script>
     <script src="renderer.js"></script>
     <script src="main.js"></script>
 </body>

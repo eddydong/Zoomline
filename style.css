@@ -1,18 +1,26 @@
-*{
-    font-family: monospace;
+/* Embed the zoomline.otf font */
+@font-face {
+    font-family: 'Zoomline';
+    src: url('./zoomline.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+* {
+    font-family: 'Zoomline', monospace; /* Use Zoomline as the primary font, fallback to monospace */
     font-size: 14px;
     color: white;
 }
 
-body{
-    margin : 0;
+body {
+    margin: 0;
     background-color: black;
     overflow: hidden;
 }
 
-#canvas{
-    top : 0;
-    left : 0;
+#canvas {
+    top: 0;
+    left: 0;
     display: block;
     position: absolute;
 }
