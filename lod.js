@@ -1,4 +1,4 @@
-const LOD = [
+var lod = [
     {
         granularity: 'second',
         step: 0.1,
