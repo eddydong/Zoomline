@@ -44,8 +44,8 @@ button:hover {
 /* styles.css */
 .control-panel {
     position: absolute;
-    top: 5px;
-    left: 5px;
+    top: 22px;
+    left: 2px;
     z-index: 100;
   }
   

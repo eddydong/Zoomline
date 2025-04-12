@@ -14,11 +14,8 @@ var control = {
 window.onresize = function() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    timeline.init();
+    timeline.resize();
 }
-
-let isZooming = false; // Flag to track zooming
-let zoomTimeout; // Timeout to reset the zooming flag
 
 canvas.addEventListener('wheel', (event) => {
     event.preventDefault();
