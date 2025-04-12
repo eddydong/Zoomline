@@ -1,16 +1,3 @@
-function getRandomColor(){
-    const palette = [
-        "#E63946", // A bold crimson red, intense and striking
-        "#F4A261", // A soft coral orange, warm and inviting
-        "#E9C46A", // A golden yellow, cheerful and bright
-        "#2A9D8F", // A teal green, refreshing and calm
-        "#264653", // A deep navy blue, strong and stable
-        "#6A4C93", // A rich purple, creative and inspiring
-        "#FFB4A2"  // A peachy pink, gentle and soothing
-    ];
-    return palette[Math.floor(Math.random() * palette.length)];
-}
-
 // Function to round down a date to the nearest specified granularity
 // Example usage: floorDT(new Date(), 'hour');
 // Supported granularities: 'second', 'minute', 'hour', 'day', 'week', 'month', 'year'
@@ -56,7 +43,7 @@ function floorDT(date, granularity, step = 1) {
         default:
             throw new Error(`Unsupported granularity: ${granularity}`);
     }
-    return d;
+    return d; // Return a valid date or epoch if invalid
 }
 
 function addDuration(date, granularity, step = 1) {
@@ -103,9 +90,9 @@ function getDuration(date, granularity, step=1) {
 function getDTList(start, end, timeline) {
     var ticks = [[],[]];
     var tickTW = [[],[]];
-    var currentTL = 0;
+    var currentLayer = 0;
     for (let i = 0; i < LOD.length; i++) {
-        ticks[currentTL] = [];
+        ticks[currentLayer] = [];
         const g = LOD[i].granularity;
         const s = LOD[i].step;
         const stepDuration = getDuration(start, g, s);
@@ -113,16 +100,16 @@ function getDTList(start, end, timeline) {
         if (stepDuration >= minDuration) {
             let current = floorDT(start, g, s);
             while (current.getTime() <= end) {
-                ticks[currentTL].push({
+                ticks[currentLayer].push({
                     dt: new Date(current),
                     label: true, // Always show labels for consistent panning
                 });
                 current = addDuration(current, g, s);
             }
-            if (currentTL==0) timeline.lod = i; // Set the current level of detail
-            tickTW[currentTL] = getDuration(timeline.tL, g, s) / timeline.mspp;
-            currentTL++;
-            if (currentTL>=2) break;
+            if (currentLayer==0) timeline.lod = i; // Set the current level of detail
+            tickTW[currentLayer] = getDuration(timeline.tL, g, s) / timeline.mspp;
+            currentLayer++;
+            if (currentLayer>1) break;
         };
     }
     timeline.ticks = ticks;

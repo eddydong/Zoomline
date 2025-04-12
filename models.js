@@ -1,26 +1,3 @@
-var view = {
-    font: "Zoomline",
-    fontSize: 14,
-    showStatus : true,
-    scaleX: 1, // Default scaleX value
-    labelW: 100,
-}
-
-var fps = {
-    lastTime : performance.now(),
-    frameCount : 0,
-    fps : 0,
-    update: ()=>{
-        const now = performance.now();
-        fps.frameCount++;
-        if (now - fps.lastTime >= 1000) {
-            fps.fps = fps.frameCount;
-            fps.frameCount = 0;
-            fps.lastTime = now;
-        }
-    }
-}
-
 var leftBar = {
     width : 200,
     color: 'rgba(255,255,255,0.1)',
@@ -36,7 +13,27 @@ var topBar = {
     height: 50,
     color: 'rgba(255,255,255,0.1)',
     leftT: Date.now(),
-}
+    render : function() {
+        ctx.save();
+        ctx.fillStyle = this.color;
+        ctx.fillRect(0, 0, canvas.width, this.height);
+
+    // currentTime = viewport.tLeft;
+    // viewport.update();
+
+    // while (currentTime <= viewport.tRight) {
+    //     const x = leftBar.width + ((currentTime - viewport.tLeft) / LOD[viewport.resID] + grid.offsetX) * grid.scaleX;
+    //     ctx.fillStyle = 'white';
+    //     ctx.font = `14px ${view.font}`;
+    // //    const dateString = currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    //     ctx.fillText(currentTime, x, 30);
+
+    //     currentTime = currentTime + LOD[viewport.resID];
+    // }
+
+        ctx.restore();
+    }
+};
 
 // {
 //     weekday: 'narrow' | 'short' | 'long',
@@ -205,22 +202,21 @@ const LOD = [
     }
 ];
 
-
-var viewport = {
-    left: leftBar.width,
-    top: topBar.height,
-    width: canvas.width - leftBar.width,
-    height: canvas.height - topBar.height,
-    tWidth: LOD[1] * view.scaleX,
-    tLeft: Date.now(),
-    tRight: 0, // placeholder, will be calculated after viewport is defined
-    msPerPixel: 0, // Placeholder, will be calculated after viewport is defined
-    lod: 0,
-    update: function() {
-        viewport.tRight = viewport.tLeft + viewport.tWidth;
-        viewport.msPerPixel = (viewport.tRight - viewport.tLeft) / viewport.width;
-    }        
-}
+// var viewport = {
+//     left: leftBar.width,
+//     top: topBar.height,
+//     width: canvas.width - leftBar.width,
+//     height: canvas.height - topBar.height,
+//     tWidth: LOD[1] * view.scaleX,
+//     tLeft: Date.now(),
+//     tRight: 0, // placeholder, will be calculated after viewport is defined
+//     msPerPixel: 0, // Placeholder, will be calculated after viewport is defined
+//     lod: 0,
+//     update: function() {
+//         viewport.tRight = viewport.tLeft + viewport.tWidth;
+//         viewport.msPerPixel = (viewport.tRight - viewport.tLeft) / viewport.width;
+//     }        
+// }
 
 var timeline = {
     ticks : [], // placeholder
@@ -228,11 +224,13 @@ var timeline = {
     // time metrics
     tL : 1743752224853, 
     tR : 0, // placeholder
+    minTL : -6e15,
+    maxTR : 6e15,
+    lod : 8,
     init : function() {
         this.sL = leftBar.width,
         this.sR = canvas.width;
         this.sW = canvas.width - leftBar.width;
-        this.lod = 8;
         this.tW = getDuration(this.tL, LOD[this.lod].granularity, LOD[this.lod].step);
         this.update();
     },
@@ -242,10 +240,38 @@ var timeline = {
         this.tR = this.tL + this.tW;
         this.mspp = this.tW / this.sW;
         this.labelTW = this.mspp * view.labelW;
-        //var foundIndex = LOD.findIndex(lod => view.labelW * this.mspp <= getDuration(this.tL, lod.granularity, lod.step));
-        //this.lod = Math.max(0, foundIndex === -1 ? LOD.length - 1 : foundIndex);
         getDTList(this.tL, this.tR, timeline);
     },
+}
+timeline.render = function() {
+    ctx.save();
+
+    for (let l =0; l<2; l++)
+    for (let i = 0; i < this.ticks[l].length; i++) {
+        var sX = (this.ticks[l][i].dt.getTime() - this.tL) / this.mspp;
+        var opacity = 1;
+        if (sX < 0 & sX > -this.tickTW[l]) opacity = (1 - (- sX / (this.tickTW[l]-leftBar.width/2))) * 1; 
+        sX += leftBar.width;
+        sX = Math.max(sX, leftBar.width);
+
+        if (opacity == 1 ){
+            ctx.beginPath();
+            ctx.moveTo(sX, l == 0 ? 25 : 0);
+            ctx.lineTo(sX, canvas.height);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+            ctx.lineWidth = l == 0 ? 0.7 : 1;
+            ctx.stroke(); // Render all lines at once
+        }
+
+        if (this.ticks[l][i].label) {
+            ctx.font = view.fontSize + 'px ' + view.font;
+            ctx.fillStyle = `rgba(255, 255, 255, ${l == 0 ? opacity : opacity * 0.7})`;
+            var date = this.ticks[l][i].dt;
+            var formattedDate = new Intl.DateTimeFormat('default', LOD[this.lod].format[l]).format(date);
+            ctx.fillText(formattedDate, sX + 6, l == 0 ? 44 : 20);
+        }
+    }
+    ctx.restore();
 }
 
 var events = {
@@ -276,37 +302,14 @@ var events = {
         };
     }),
 };
-
-function Cell(name, desc, start, duration, end) {
-    this.name = name || "";
-    this.type = 
-    this.desc = desc || "";
-    this.start = start || null; // datetime
-    this.start = start ? new Date(start) : null;
-    if (start && duration) { // duration is in minutes
-        this.duration = duration;
-        this.end = new Date(start.getTime() + duration * 60000);
-    } else if (start && end) {
-        this.end = end;
-        this.duration = Math.round((end - start) / 60000);
+events.render = function() {
+    ctx.save();
+    for (let i = 0; i < this.length; i++) {
+        const event = this[i];
+        ctx.fillStyle = event.color;
+        ctx.fillRect(event.x, event.y, event.width, event.height);
+        ctx.strokeStyle = 'black';
+        ctx.strokeRect(event.x, event.y, event.width, event.height);
     }
-    this.x = 0;
-    this.y = 0;
-    this.width = 0;
-    this.height = 0;
-    this.color = getRandomColor();
-}
-
-function Grid(rows, cols) {
-    this.grid = [];
-    this.rows = rows;
-    this.cols = cols;
-    this.cellWidth = 100;
-    this.cellHeight = 100;
-    this.grid = Array.from({ length: rows }, 
-        () => Array.from({ length: cols }, () => getRandomColor()));
-    this.offsetX = leftBar.width;
-    this.offsetY = topBar.height;
-    this.scaleX = Math.max(1, (canvas.width - leftBar.width) / (this.cellWidth * this.cols));
-    this.scaleY = Math.max(1, (canvas.height - topBar.height) / (this.cellHeight * this.rows));
+    ctx.restore();
 }

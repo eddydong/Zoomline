@@ -11,16 +11,6 @@ var control = {
     zoomMinY : 0.05,
 }
 
-canvas.getPixelRGBA = function(x, y) {
-    const imageData = ctx.getImageData(x, y, 1, 1);
-    return {
-        r: imageData.data[0],
-        g: imageData.data[1],
-        b: imageData.data[2],
-        a: imageData.data[3]
-    };
-}
-
 window.onresize = function() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
@@ -60,24 +50,27 @@ canvas.addEventListener('wheel', (event) => {
         newTW = Math.max(timeline.minTW, Math.min(newTW, timeline.maxTW)); // Clamp the zoom level
         if (newTW !== timeline.tW) {
             timeline.tL = mouseTime - (mouseTime - timeline.tL) * (newTW / timeline.tW);
+            if (timeline.tL < timeline.minTL) {
+                timeline.tL = timeline.minTL;
+            }
+            if (timeline.tL > timeline.maxTR - newTW) {
+                timeline.tL = timeline.maxTR - newTW;
+            }
             timeline.tW = newTW;
             timeline.update();
         }
     }
 
     if (event.shiftKey) { 
-        isZooming = true; // Set zooming flag
-        clearTimeout(zoomTimeout); // Clear any existing timeout
         zoom('shift');
-        zoomTimeout = setTimeout(() => isZooming = false, 100); // Reset zooming flag after 100ms
     } else if (event.ctrlKey) { 
-        isZooming = true; // Set zooming flag
-        clearTimeout(zoomTimeout); // Clear any existing timeout
         zoom('pinch');
-        zoomTimeout = setTimeout(() => isZooming = false, 100); // Reset zooming flag after 100ms
-    } else if (!isZooming) { // Only pan if not zooming
-        if (Math.abs(deltaX) > 0.1) { // Ignore small residual deltaX values
-            timeline.tL += deltaX * timeline.mspp * control.panningSpeed;
+    } else {
+        var delta = deltaX * timeline.mspp * control.panningSpeed;
+        var newTL = timeline.tL + delta;
+        var tL = Math.min(timeline.maxTR-timeline.tW, Math.max(newTL, timeline.minTL));
+        if (!isNaN(new Date(tL).getTime()) && Math.abs(deltaX) > 0.05) {
+            timeline.tL = tL;
             timeline.update();
         }
     }
