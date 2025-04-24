@@ -9,7 +9,7 @@ var events = {
         let paletteIndex = 0;
 
         // Generate groups with unique colors
-        const groups = Array.from({ length: 15 }, (_, groupIndex) => {
+        const groups = Array.from({ length: 20 }, (_, groupIndex) => {
             const color = palette[paletteIndex];
             paletteIndex = (paletteIndex + 1) % palette.length; // Move to the next color in the palette
             return {
@@ -32,7 +32,7 @@ var events = {
 
         // Generate events for each track
         const events = tracks.flatMap((track) => {
-            const eventCount = Math.floor(Math.random() * 80) + 20; // Generate between 10 and 100 events
+            const eventCount = Math.floor(Math.random() * 100) + 50; // Generate between 10 and 100 events
             const yearStart = new Date("2025-01-01").getTime(); // Start of the year
             const yearEnd = new Date("2025-12-31").getTime(); // End of the year
             const interval = (yearEnd - yearStart) / eventCount; // Divide the year into equal intervals
@@ -47,8 +47,8 @@ var events = {
                 // Ensure 95% of events have a duration shorter than 4 hours
                 const isShortEvent = Math.random() < 0.95;
                 const randomDuration = isShortEvent
-                    ? 0.5 * Math.ceil(Math.random() * (8 / 0.5)) // Duration between 0.5 and 4 hours
-                    : 0.5 * Math.ceil(Math.random() * (240 / 0.5)); // Duration between 0.5 and 48 hours
+                    ? 0.5 * (Math.ceil(Math.random() * (8))+2) // Duration between 0.5 and 4 hours
+                    : 0.5 * Math.ceil(Math.random() * (120)); // Duration between 0.5 and 48 hours
 
                 const randomEnd = randomStart + randomDuration * 60 * 60 * 1000; // Calculate the end time
                 lastEnd = randomEnd; // Update the last end time for the next event
