@@ -23,7 +23,7 @@ var events = {
             return Array.from({ length: 5 }, (_, trackIndex) => {
                 const isBright = trackIndex % 2 === 0; // Alternate between 80% and 50% brightness
                 return {
-                    groupName: group.name,
+                    group: group.name,
                     name: `Track${groupIndex + 1}-${trackIndex + 1}`, // Globally unique track name
                     color: deriveColor(group.color, isBright), // Derive track color from the group color
                 };
@@ -54,12 +54,15 @@ var events = {
                 lastEnd = randomEnd; // Update the last end time for the next event
 
                 return {
-                    trackName: track.name,
+                    group: track.group,
+                    track: track.name,
                     name: `Event-${track.name}-${eventIndex + 1}`, // Unique event name
                     start: new Date(randomStart),
                     end: new Date(randomEnd),
                     duration: randomDuration,
                     color: track.color, // Inherit color from the parent track
+                    desc: `Description for ${track.name} - Event ${eventIndex + 1}`,
+                    location: `Location for ${track.name} - Event ${eventIndex + 1}`,
                 };
             });
         });
@@ -98,18 +101,19 @@ var events = {
                 // Stop rendering if the index exceeds the number of tracks
                 if (i >= events.data.tracks.length) break;
 
-                const y = i * events.eventH * events.zoomY + events.offsetY;
-                const height = events.eventH * events.zoomY;
+                const trackY = i * events.eventH * events.zoomY + events.offsetY;
+                const trackH = events.eventH * events.zoomY;
 
                 const track = events.data.tracks[i];
-                const group = events.data.groups.find(g => g.name === track.groupName);
+                const group = events.data.groups.find(g => g.name === track.group);
 
                 // Finalize the current group if the group changes or if this is the last track
                 if (currentGroup !== group || i === events.data.tracks.length - 1 || i === endIndex) {
                     if (currentGroup) {
                         // Calculate the group's position and height
-                        const groupY = groupStartIndex * events.eventH * events.zoomY + events.offsetY;
-                        const groupHeight = (i - groupStartIndex + (i === events.data.tracks.length - 1 ? 1 : 0)) * events.eventH * events.zoomY;
+                        var groupY = groupStartIndex * events.eventH * events.zoomY + events.offsetY;
+                        var groupHeight = (i - groupStartIndex + (i === events.data.tracks.length - 1 ? 1 : 0)) * events.eventH * events.zoomY;
+                        //if (i===endIndex) groupHeight = canvas.height - groupY - events.timeline.topBar.height; 
 
                         // Render the group background
                         const groupColorWithOpacity = currentGroup.color.replace('rgb', 'rgba').replace(')', ', 0.8)');
@@ -151,16 +155,16 @@ var events = {
                 // Render the track background
                 const trackColorWithOpacity = track.color.replace('rgb', 'rgba').replace(')', ', 0.8)');
                 ctx.fillStyle = trackColorWithOpacity;
-                ctx.fillRect(groupColumnWidth, y + events.timeline.topBar.height, trackColumnWidth, height);
+                ctx.fillRect(groupColumnWidth, trackY + events.timeline.topBar.height, trackColumnWidth, trackH);
 
                 // Render the track name
                 const trackFontColor = getFontColor(track.color);
-                if (view.fontSize <= height - view.textPadding * 2) {
+                if (view.fontSize <= trackH - view.textPadding * 2) {
                     ctx.fillStyle = trackFontColor;
                     ctx.fillText(
                         track.name,
                         groupColumnWidth + view.textPadding, // Padding from the left of the track column
-                        y + events.timeline.topBar.height + view.textPadding + height / 2 - view.fontSize/2 // Centered vertically
+                        trackY + events.timeline.topBar.height + view.textPadding + trackH / 2 - view.fontSize/2 // Centered vertically
                     );
                 }
             }
@@ -174,8 +178,8 @@ var events = {
 
         // Render the event bars first
         const containerHeight = canvas.height - this.timeline.topBar.height; // Height of the container
-        const startIndex = Math.max(0, Math.floor(-this.offsetY / (this.eventH * this.zoomY))); // First visible row index
-        const endIndex = Math.ceil((containerHeight - this.offsetY) / (this.eventH * this.zoomY)); // Last visible row index
+        const startIndex = Math.max(0, Math.floor(-this.offsetY / (this.eventH * this.zoomY))); // First visible row/track index
+        const endIndex = Math.ceil((containerHeight - this.offsetY) / (this.eventH * this.zoomY)); // Last visible row/track index
 
         for (let i = startIndex; i < endIndex; i++) {
             // Stop rendering if the index exceeds the number of tracks
@@ -185,7 +189,7 @@ var events = {
             const height = this.eventH * this.zoomY; // Adjust height based on zoom
 
             const track = this.data.tracks[i];
-            const eventsForTrack = this.data.events.filter(event => event.trackName === track.name);
+            const eventsForTrack = this.data.events.filter(event => event.track === track.name);
 
             // Render the event bars
             eventsForTrack.forEach(event => {
@@ -277,16 +281,6 @@ var events = {
     }
 };
 
-// Helper function to convert hex color to RGB
-function hexToRgb(hex) {
-    const bigint = parseInt(hex.slice(1), 16);
-    return {
-        r: (bigint >> 16) & 255,
-        g: (bigint >> 8) & 255,
-        b: bigint & 255,
-    };
-}
-
 // Helper function to calculate brightness and determine font color
 function getFontColor(backgroundColor) {
     var rgb = backgroundColor;
@@ -335,16 +329,6 @@ function rgbToHsl(r, g, b) {
     return { h, s, l };
 }
 
-// Convert RGB to Hex
-function rgbToHex(rgb) {
-    const toHex = (value) => {
-        const hex = Math.round(value).toString(16);
-        return hex.length === 1 ? "0" + hex : hex;
-    };
-
-    return `#${toHex(rgb.r)}${toHex(rgb.g)}${toHex(rgb.b)}`;
-}
-
 // Convert HSL to RGB
 function hslToRgb(h, s, l) {
     let r, g, b;
@@ -369,6 +353,26 @@ function hslToRgb(h, s, l) {
     }
 
     return { r: r * 255, g: g * 255, b: b * 255 };
+}
+
+// Convert RGB to Hex
+function rgbToHex(rgb) {
+    const toHex = (value) => {
+        const hex = Math.round(value).toString(16);
+        return hex.length === 1 ? "0" + hex : hex;
+    };
+
+    return `#${toHex(rgb.r)}${toHex(rgb.g)}${toHex(rgb.b)}`;
+}
+
+// Helper function to convert hex color to RGB
+function hexToRgb(hex) {
+    const bigint = parseInt(hex.slice(1), 16);
+    return {
+        r: (bigint >> 16) & 255,
+        g: (bigint >> 8) & 255,
+        b: bigint & 255,
+    };
 }
 
 // Helper function to derive a track color from a group color

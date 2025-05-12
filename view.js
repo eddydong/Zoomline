@@ -50,19 +50,22 @@ var view = {
         ctx.fillText('tickTWs: ' + timeline.tickTW[0] + " "+timeline.tickTW[1], 400, 780);  
     },
 
-    animate: function() {
+    render: function() {
         view.fps.update();
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.save();
-            //ctx.translate(grid.offsetX, grid.offsetY);
-            //ctx.scale(grid.scaleX, grid.scaleY);
-            // grid.render();
-            // events.render();
-        ctx.restore()
+
+        // Update animations every frame
+        updateAnimations();
+
+        // Render timeline and events
         events.render();
         timeline.render();
-        //showStatus();
+
+        // Show FPS
         if (view.showStatus) view.fps.render();
-        requestAnimationFrame(view.animate);
+
+        ctx.restore();
+        requestAnimationFrame(view.render);
     }
 }

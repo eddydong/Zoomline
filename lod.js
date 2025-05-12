@@ -4,7 +4,7 @@ var lod = [
         step: 0.1,
         format: [
             { minute: "2-digit", second: "2-digit", fractionalSecondDigits: 1 },
-            { year: "numeric", month: "long", day: "2-digit", hour: "2-digit",hour12: false, }
+            { year: "numeric", month: "long", day: "2-digit", weekday:"short", hour: "2-digit",hour12: false, }
         ]
     },
     {
@@ -12,7 +12,7 @@ var lod = [
         step: 1,
         format: [
             {  minute: "2-digit", hour12: false, second: "2-digit" },
-            { year: "numeric", month: "long", day: "2-digit", hour: "2-digit",hour12: false }
+            { year: "numeric", month: "long", day: "2-digit", weekday:"short",hour: "2-digit",hour12: false }
         ]
     },
     {
@@ -20,7 +20,7 @@ var lod = [
         step: 10,
         format: [
             { minute: "2-digit", hour12: false, second: "2-digit" },
-            { year: "numeric", month: "long", day: "2-digit", hour: "2-digit",hour12: false }
+            { year: "numeric", month: "long", day: "2-digit", weekday:"short",hour: "2-digit",hour12: false }
         ]
     },
     {
@@ -28,7 +28,7 @@ var lod = [
         step: 1,
         format: [
             { hour: "2-digit", minute: "2-digit", hour12: false },
-            { year: "numeric", month: "long", day: "2-digit",hour12: false,  hour: "2-digit"}
+            { year: "numeric", month: "long", day: "2-digit",weekday:"short",hour12: false,  hour: "2-digit"}
         ]
     },
     {
@@ -36,7 +36,7 @@ var lod = [
         step: 10,
         format: [
             { hour: "2-digit", minute: "2-digit", hour12: false },
-            { year: "numeric", month: "long", day: "2-digit" }
+            { year: "numeric", month: "long", day: "2-digit", weekday:"short" }
         ]
     },
     {
@@ -44,7 +44,7 @@ var lod = [
         step: 1,
         format: [
             { hour: "2-digit", minute: "2-digit", hour12: false },
-            { year: "numeric", month: "long", day: "2-digit" }
+            { year: "numeric", month: "long", day: "2-digit", weekday:"short" }
         ]
     },
     {
@@ -52,7 +52,7 @@ var lod = [
         step: 8,
         format: [
             { hour: "2-digit", minute: "2-digit", hour12: false },
-            { year: "numeric", month: "long", day: "2-digit" }
+            { year: "numeric", month: "long", day: "2-digit", weekday:"short" }
         ]
     },
     {
